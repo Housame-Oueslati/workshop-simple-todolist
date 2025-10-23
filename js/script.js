@@ -17,24 +17,24 @@ todoForm.addEventListener('submit', function(event) {
 // 3. Börja med en tom array på todos
 // samt ett id som börjar på noll
 let todos = [];
-let nextId = 0;
+let id = 0;
 
 
 
 
 // 4. Lägg till en Todo som ett objekt  i arrayen todos
 function addTodo() {
-    const todoText = todoInput.value.trim();
-
+    const inputVal = todoInput.value.trim();
+    const todoText = inputVal && String(inputVal[0]).toUpperCase() + String(inputVal).slice(1) || "";
     // Kolla så att det inte är tomt
     if (todoText !== "") {
         const newTodo = {
-            id: nextId,
+            id: id,
             text: todoText,
             completed: false
         };
         todos.push(newTodo);
-        nextId++;   
+        id++;   
         renderList();
         todoInput.value = ""; // Rensa inputfältet
     }    
@@ -56,7 +56,8 @@ function renderList() {
         if(todo.completed){
             li.style.textDecoration = "line-through";
         }
-
+        
+        // Iterera genom varje list-element och skapa en <li></li> med todo-texten, samt en close-knapp
         const closeBtn = document.createElement("span");
         closeBtn.textContent = " ×";
         closeBtn.style.color = "red";
@@ -68,7 +69,7 @@ function renderList() {
         
     });
 
-    // Iterera genom varje list-element och skapa en <li></li> med todo-texten, samt en close-knapp
+
 
 }
 
@@ -77,19 +78,31 @@ function renderList() {
 
 // BONUS! Uppdatera eller ta bort en Todo. Använd er av s.k event delegation
 todoList.addEventListener('click', function(event) {
-        // Element som klickades på i listan
-        console.log(event.target);
+    // Element som klickades på i listan
+    console.log(event.target);
 
-        // Om man texten klickas => anropa toggleTodoCompletion
+    const id = parseInt(event.target.parentElement.dataset.id);
 
-        // Eller om close-knappen klickas => anrop deleteTOto
+    // Om man klickar på texten => anropa toggleTodoCompletion
+    if (event.target.tagName === "LI") {
+        toggleTodoCompletion(parseInt(event.target.dataset.id));
+    }
+
+    // Om close-knappen klickas => anropa deleteTodo
+    if (event.target.classList.contains("close-btn")) {
+        deleteTodo(id);
+    }
 
 });
 
 
 // Bonus! Uppdatera en todo med visst id. Toggle "completed"
 function toggleTodoCompletion(id) {
-
+    const todo = todos.find((t) => t.id === id);
+    if (todo) {
+        todo.completed = !todo.completed;
+        renderList();
+    }
 
 }
 
@@ -97,7 +110,8 @@ function toggleTodoCompletion(id) {
 
 // Bonus
 function deleteTodo(id) {
-  
+  todos = todos.filter((t) => t.id !== id);
+  renderList();  
 }
 
 
